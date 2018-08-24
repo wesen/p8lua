@@ -62,6 +62,7 @@ Include lib/collisions.lua, which is a plain copy.
 
 import re
 import os
+from typing import Optional
 
 from watchgod import watch, Change
 
@@ -239,7 +240,7 @@ def on_lua_changed(lua_fn):
         pass
 
 
-def create_lua_from_p8():
+def create_lua_from_p8() -> Optional[str]:
     # create .lua files from .p8 files if not yet there
     for filename in os.listdir("."):
         if filename.endswith(".p8"):
@@ -250,6 +251,10 @@ def create_lua_from_p8():
                 # write out new lua file
                 with open(lua_fn, "w") as luaf:
                     luaf.write(result['lua'])
+
+            return filename[:-3] + ".lua"
+
+    return None
 
 
 # noinspection PyPep8Naming
@@ -277,8 +282,12 @@ def create_lua_from_p8():
 
 
 # create lua files for p8 carts, which don't have corresponding lua files yet
-create_lua_from_p8()
+main_file = create_lua_from_p8()
+print("Found main_file {}".format(main_file))
 
-for changes in watch('.'):
-    for change, file in changes:
-        on_lua_changed(file)
+if os.path.isfile(main_file):
+    for changes in watch('.'):
+        for change, file in changes:
+            if file.endswith("lua"):
+                print("change: {} file: {}".format(change, file))
+                on_lua_changed(main_file)
