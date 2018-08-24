@@ -60,10 +60,10 @@ Include lib/collisions.lua, which is a plain copy.
 
 """
 
-import pyinotify
-
 import re
 import os
+
+from watchgod import watch, Change
 
 from shutil import copyfile
 
@@ -232,7 +232,7 @@ def on_lua_changed(lua_fn):
         copyfile(p8_fn, p8_fn + ".bak")
 
         # write out new p8
-        with open(p8_fn, "wb") as p8f:
+        with open(p8_fn, "w") as p8f:
             p8f.write(new_p8_content)
     except IOError:
         pass
@@ -247,42 +247,37 @@ def create_lua_from_p8():
                 print("*** generating .lua file from .p8 file " + lua_fn)
                 result = parse_p8(filename)
                 # write out new lua file
-                with open(lua_fn, "wb") as luaf:
+                with open(lua_fn, "w") as luaf:
                     luaf.write(result['lua'])
 
 
 # noinspection PyPep8Naming
-class Identity(pyinotify.ProcessEvent):
-
-    def process_IN_CREATE(self, event):
-        if event.pathname.endswith(".p8"):
-            create_lua_from_p8()
-
-    def process_IN_DELETE(self, event):
-        if event.pathname.endswith(".lua"):
-            create_lua_from_p8()
-
-    # normal text editor change to the lua file
-    def process_IN_MODIFY(self, event):
-        # print "MODIFY "+event.pathname
-        if event.pathname.endswith(".lua"):
-            on_lua_changed(event.pathname)
-
-    # Intellij Idea moves stuff when changed
-    def process_IN_MOVED_TO(self, event):
-        # print "MOVED "+event.pathname
-        if event.pathname.endswith(".lua"):
-            on_lua_changed(event.pathname)
+# class Identity(pyinotify.ProcessEvent):
+#
+#     def process_IN_CREATE(self, event):
+#         if event.pathname.endswith(".p8"):
+#             create_lua_from_p8()
+#
+#     def process_IN_DELETE(self, event):
+#         if event.pathname.endswith(".lua"):
+#             create_lua_from_p8()
+#
+#     # normal text editor change to the lua file
+#     def process_IN_MODIFY(self, event):
+#         # print "MODIFY "+event.pathname
+#         if event.pathname.endswith(".lua"):
+#             on_lua_changed(event.pathname)
+#
+#     # Intellij Idea moves stuff when changed
+#     def process_IN_MOVED_TO(self, event):
+#         # print "MOVED "+event.pathname
+#         if event.pathname.endswith(".lua"):
+#             on_lua_changed(event.pathname)
 
 
 # create lua files for p8 carts, which don't have corresponding lua files yet
 create_lua_from_p8()
 
-# initialize watching on file changes
-wm = pyinotify.WatchManager()
-# Stats is a subclass of ProcessEvent provided by pyinotify
-# for computing basics statistics.
-s = pyinotify.Stats()
-notifier = pyinotify.Notifier(wm, default_proc_fun=Identity(s))
-wm.add_watch(".", pyinotify.ALL_EVENTS, rec=True, auto_add=True)
-notifier.loop()
+for changes in watch('.'):
+    for change, file in changes:
+        on_lua_changed(file)
