@@ -139,7 +139,7 @@ def convert_p8_syntax_to_lua(lua):
 def process_lua_for_p8(lua):
     # defined and active pre-processor labels
     defined = set()
-	active = set()	
+    active = set()
 
     # in the first pass, only consider #include pre-processor commands
     result = ""
@@ -152,8 +152,8 @@ def process_lua_for_p8(lua):
         else:
             result += line + "\n"
     lua = result
-	
-	result=""
+
+    result = ""
     for line in lua.splitlines():
 
         if line.startswith("--#define "):
@@ -174,15 +174,18 @@ def process_lua_for_p8(lua):
             if re.match("^\s*--.*$", line):
                 continue
             # end of line comment
-			line = re.sub("\s*--.*$", "", line) 
+            line = re.sub("\s*--.*$", "", line)
+
+        if is_active_code(active, defined):
+            result += line + "\n"
 
     # remove multi line comments
     if "removecomments" in defined:
         result = re.sub("--\[\[.*?\]\]--", "\n", result, flags=re.DOTALL)  # multi line comment
 
     # convert .p8 specific stuff to lua code
-	if "plainlua" in defined:	
-		result = convert_p8_syntax_to_lua(result)	
+    if "plainlua" in defined:
+        result = convert_p8_syntax_to_lua(result)
 
     return result
 
@@ -219,6 +222,7 @@ def on_lua_changed(lua_fn):
 
     # evaluate pre-processors and stuff
     lua_content = process_lua_for_p8(lua_content)
+    # print("lua: {}".format(lua_content[:20]))
 
     # insert new code
     try:
