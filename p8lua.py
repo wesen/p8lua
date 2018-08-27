@@ -203,7 +203,7 @@ def is_active_code(active, defined):
 
 def parse_p8(fn):
     # read .p8
-    with open(fn) as p8f:
+    with open(fn, 'r', encoding='latin1') as p8f:
         p8_content = p8f.read()
         result = re.findall("(.*\n__lua__\n)(.*)(\n__gfx__\n.*)", p8_content, re.MULTILINE | re.DOTALL)
         return {'head': result[0][0], 'lua': result[0][1], 'tail': result[0][2]}
