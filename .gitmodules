@@ -1,0 +1,3 @@
+[submodule "vendor/picotool"]
+	path = vendor/picotool
+	url = https://github.com/dansanderson/picotool
