@@ -23,8 +23,13 @@ def main():
     g = game.Game.from_filename(sys.argv[1])  # type: pico8.game
     lines = []
     for y in range(32):
-        line = [str(g.map.get_cell(x, y) + 1) for x in range(128)]
-        line = ",".join(line)
+        tiles = []
+        for x in range(128):
+            tile = g.map.get_cell(x, y) + 1
+            if tile == 1:
+                tile = 0
+            tiles.append(str(tile))
+        line = ",".join(tiles)
         lines.append(line)
 
     with open(sys.argv[2], 'w') as f:
