@@ -7,9 +7,9 @@ sys.path.append(vendor_path)
 from pico8.game import game
 
 XML_PREAMBLE = """<?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="128" height="32" tilewidth="8" tileheight="8" infinite="0" nextobjectid="1">
+<map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="128" height="64" tilewidth="8" tileheight="8" infinite="0" nextobjectid="1">
  <tileset firstgid="1" source="tileset.tsx"/>
- <layer name="Tile Layer 1" width="128" height="32">
+ <layer name="Tile Layer 1" width="128" height="64">
   <data encoding="csv">
 """
 
@@ -22,7 +22,7 @@ XML_POSTAMBLE = """</data>
 def main():
     g = game.Game.from_filename(sys.argv[1])  # type: pico8.game
     lines = []
-    for y in range(32):
+    for y in range(64):
         tiles = []
         for x in range(128):
             tile = g.map.get_cell(x, y) + 1

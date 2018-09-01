@@ -18,13 +18,13 @@ def main():
     e = xml.etree.ElementTree.parse(filename).getroot()
     data = e.find('.//data')
     tiles = [int(tile) - 1 for tile in re.split(r'[\s,]+', data.text) if tile != '']
-    if len(tiles) != 4096:
+    if len(tiles) != 8192:
         print("Invalid tiled format")
         sys.exit(1)
 
     g = game.Game.from_filename(sys.argv[2])  # type: pico8.game
 
-    for y in range(32):
+    for y in range(64):
         for x in range(128):
             tile = tiles[v_idx(x, y)]
             if tile == -1:
