@@ -23,6 +23,10 @@ def main():
         sys.exit(1)
 
     g = game.Game.from_filename(sys.argv[2])  # type: pico8.game
+    if len(g.gfx._data) < 8192:
+        tmp = bytearray(8192)
+        tmp[:len(g.gfx._data)] = g.gfx._data
+        g.gfx._data = tmp
 
     for y in range(64):
         for x in range(128):
